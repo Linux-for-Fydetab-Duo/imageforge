@@ -63,12 +63,14 @@ def debstrap_packages() -> None:
         [
             "mmdebstrap",
             +" --arch="
-            + uname()[-1]
+            + cfg["arch"]
             + " --include="
             + ",".join(cfg["packages"])
             + ' --components="'
             + " ".join(cfg["components"])
-            + """" --customize-hook='PATHTOCUSTOMIZE.PYORSH "$1"' --verbose """
+            + '"'
+            + f" --customize-hook='{cfg["config_dir"] + "customize.sh" + " " + cfg["install_dir"]}'"
+            + " --verbose "
             + cfg["suite"]
             + " "
             + cfg["install_dir"]
