@@ -118,6 +118,10 @@ class Config:
                 self.cfg["config_dir"], "pacman.conf." + self.cfg["arch"]
             )
 
+        self.cfg["components"] = params.get("components", None)
+        self.cfg["suite"] = params.get("suite", None)
+        self.cfg["mirror"] = params.get("mirror", None)
+
         # Validation
         self._validate()
 
