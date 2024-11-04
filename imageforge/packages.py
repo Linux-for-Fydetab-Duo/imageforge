@@ -1,5 +1,6 @@
 import subprocess
 from .config import logging, cfg
+from os import uname
 
 
 def pacstrap_packages() -> None:
@@ -36,3 +37,45 @@ def pacstrap_packages() -> None:
         shell=True,
     )
     logging.info("Pacstrap complete")
+
+
+def debstrap_packages() -> None:
+    """
+    Install packages using mmdebstrap.
+
+    This function installs packages using the mmdebstrap command. It takes no arguments and returns nothing.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Nothing
+    """
+
+    logging.info("Install dir is:" + cfg["install_dir"])
+    if cfg["install_dir"] is None:
+        logging.error("Install directory not set")
+        exit(1)
+
+    subprocess.run(
+        [
+            "mmdebstrap",
+            +" --arch="
+            + uname()[-1]
+            + " --include="
+            + ",".join(cfg["packages"])
+            + ' --components="'
+            + " ".join(cfg["components"])
+            + """" --customize-hook='PATHTOCUSTOMIZE.PYORSH "$1"' --verbose """
+            + cfg["suite"]
+            + " "
+            + cfg["install_dir"]
+            + " "
+            + cfg["mirror"],
+        ],
+        check=True,
+        shell=True,
+    )
+    logging.info("Debstrap complete")
