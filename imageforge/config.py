@@ -162,10 +162,10 @@ class Config:
                 )
                 exit(1)
         elif self.cfg["base"] == "debian":
-            exit("Error: Debian is not supported yet")
             # if os.path.isfile(config_dir + '/sources.list.' + self.cfg["arch"]):
             #     logging.error("Sources list file not found")
             #     exit(1)
+            pass
 
     def _read_packages(self, packages_file):
         with open(packages_file, "r") as f:

@@ -193,6 +193,8 @@ def partition(disk: str, img_size: int, split: bool = False) -> None:
             shell=True,
         )
         os.mkdir(cfg["mnt_dir"] + "/boot")
+        if cfg["has_uefi"]:
+            os.mkdir(cfg["mnt_dir"] + "/boot/efi")
 
     logging.info("Partitioned successfully")
 
@@ -258,13 +260,15 @@ def create_fstab(ldev, ldev_alt=None, simple_vfat=False) -> None:
     with open(cfg["mnt_dir"] + "/etc/fstab", "a") as f:
         if cfg["has_uefi"]:
             boot_fs = get_parttype(ldev + "p2")
+            mount_point = "/boot/efi"
         else:
             boot_fs = get_parttype(ldev + "p1")
+            mount_point = "/boot"
         if boot_fs == "vfat":
             f.write(
                 id1
                 + ((28 * " ") if len(id1) == 14 else "")
-                + "/boot"
+                + mount_point
                 + 17 * " "
                 + boot_fs
                 + (" " if cfg["fs"] == "btrfs" else "")
@@ -279,7 +283,8 @@ def create_fstab(ldev, ldev_alt=None, simple_vfat=False) -> None:
                     if not cfg["has_uefi"]
                     else get_fsline(ldev + "p1")
                 )
-                + " /boot"
+                + " "
+                + mount_point
                 + 17 * " "
                 + boot_fs
                 + (" " if cfg["fs"] == "btrfs" else "")
@@ -335,26 +340,30 @@ def grub_install(arch: str = "arm64-efi") -> None:
         'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"',
         f'GRUB_CMDLINE_LINUX_DEFAULT="{grubcmdl}"',
     )
-    if grubdtb:
-        grubconf = grubconf.replace(
-            '# GRUB_DTB="path_to_dtb_file"', f'GRUB_DTB="{grubdtb}"'
-        )
+    if cfg["base"] == "debian":
+        if grubdtb:
+            grubconf += f'\nGRUB_DTB="{grubdtb}"'
+    else:
+        if grubdtb:
+            grubconf = grubconf.replace(
+                '# GRUB_DTB="path_to_dtb_file"', f'GRUB_DTB="{grubdtb}"'
+            )
     grubfile = open(cfg["mnt_dir"] + "/etc/default/grub", "w")
     grubfile.write(grubconf)
     grubfile.close()
     run_chroot_cmd(
         cfg["mnt_dir"],
         [
-            "grub-install",
+            "/sbin/grub-install",
             f"--target={arch}",
-            "--efi-directory=/boot",
+            "--efi-directory=/boot/efi",
             "--removable",
             f"--bootloader-id={cfg['base']}",
         ],
     )
     if not os.path.exists(cfg["mnt_dir"] + "/boot/grub"):
         os.mkdir(cfg["mnt_dir"] + "/boot/grub")
-    run_chroot_cmd(cfg["mnt_dir"], ["grub-mkconfig", "-o", "/boot/grub/grub.cfg"])
+    run_chroot_cmd(cfg["mnt_dir"], ["/sbin/grub-mkconfig", "-o", "/boot/grub/grub.cfg"])
 
 
 def cleanup() -> None:

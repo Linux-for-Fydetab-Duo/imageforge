@@ -61,15 +61,15 @@ def debstrap_packages() -> None:
 
     subprocess.run(
         [
-            "mmdebstrap",
-            +" --arch="
+            "mmdebstrap"
+            + " --arch="
             + cfg["arch"]
             + " --include="
             + ",".join(cfg["packages"])
             + ' --components="'
             + " ".join(cfg["components"])
             + '"'
-            + f" --customize-hook='{cfg["config_dir"] + "customize.sh" + " " + cfg["install_dir"]}'"
+            + f" --customize-hook='{cfg["config_dir"] + "/customize.sh" + " " + cfg["install_dir"]}'"
             + " --verbose "
             + cfg["suite"]
             + " "
