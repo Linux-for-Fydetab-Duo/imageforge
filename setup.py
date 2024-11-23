@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="imageforge",
-    version="1.0.0",
+    version="1.1.0",
     author="Panda",
     author_email="panda@fydeos.io",
     description="A Python package for linux system image creation",

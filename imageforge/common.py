@@ -208,7 +208,7 @@ def copyfiles(ot: str, to: str, retainperms=False) -> None:
     """
     logging.info("Copying files to " + to)
     if retainperms:
-        subprocess.run("cp -apr " + ot + "/* " + to, shell=True)
+        subprocess.run(f"rsync -ah --progress --exclude=proc/* {ot}/ {to}/", shell=True)
     else:
         subprocess.run("cp -ar " + ot + "/* " + to, shell=True)
 

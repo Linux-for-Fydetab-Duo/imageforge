@@ -1,7 +1,7 @@
 #Maintainer: Panda <panda@bredos.org>
 
 pkgname=python-imageforge
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 depends=('python>=3.12')
 url=""
